@@ -1127,9 +1127,104 @@
     footer { flex-direction: column; text-align: center; }
     .hero-stats { flex-direction: column; gap: 1.5rem; }
   }
+
+  /* ── SCROLL TO TOP ───────────────── */
+  #scrollTop {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+    width: 46px; height: 46px;
+    background: var(--gold);
+    color: var(--black);
+    border: none; border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(212,160,23,0.4);
+  }
+  #scrollTop.show { opacity: 1; pointer-events: auto; }
+  #scrollTop:hover { transform: translateY(-4px) scale(1.1); box-shadow: 0 8px 30px rgba(212,160,23,0.6); }
+
+  /* ── DARK MODE TOGGLE ────────────── */
+  #themeToggle {
+    position: fixed; bottom: 2rem; left: 2rem; z-index: 999;
+    width: 46px; height: 46px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold);
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  #themeToggle:hover { transform: scale(1.1); border-color: var(--gold); box-shadow: 0 8px 30px var(--glow-gold); }
+
+  /* ── LIGHT MODE OVERRIDES ────────── */
+  body.light-mode {
+    --black: #f4f4f4;
+    --dark: #e8e8e8;
+    --card: #ffffff;
+    --border: #d0d0d0;
+    --glass-bg: rgba(255,255,255,0.75);
+    --glass-border: rgba(212,160,23,0.25);
+    --text: #1a1a1a;
+    --muted: #555555;
+    --white: #111111;
+  }
+
+  /* ── WHATSAPP BTN ────────────────── */
+  .btn-whatsapp {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 36px;
+    background: #25D366;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(37,211,102,0.3);
+    border: none; cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .btn-whatsapp:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(37,211,102,0.5);
+    background: #20bb5a;
+  }
+
+  /* ── WHATSAPP BADGE in contact-info ─ */
+  .whatsapp-note {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 1.5rem;
+    padding: 12px 16px;
+    background: rgba(37,211,102,0.08);
+    border: 1px solid rgba(37,211,102,0.25);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: #25D366;
+    letter-spacing: 0.5px;
+  }
+  .whatsapp-note i { font-size: 1.1rem; }
 </style>
 </head>
 <body>
+
+<!-- ── SCROLL TO TOP ─────────────────────────── -->
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- ── THEME TOGGLE ──────────────────────────── -->
+<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+  <i class="fas fa-sun" id="themeIcon"></i>
+</button>
 
 <!-- ── NAV ─────────────────────────────────────── -->
 <nav id="navbar">
@@ -1446,6 +1541,11 @@
           <div class="contact-item-text">Coimbatore, Tamil Nadu, India</div>
         </div>
       </div>
+
+      <div class="whatsapp-note">
+        <i class="fab fa-whatsapp"></i>
+        Messages sent via the form will reach me directly on WhatsApp!
+      </div>
     </div>
 
     <div class="contact-form fade-in">
@@ -1467,11 +1567,11 @@
         <label>Message</label>
         <textarea id="fmessage" placeholder="Tell me about the opportunity..."></textarea>
       </div>
-      <button class="form-submit" onclick="submitForm()">
-        <i class="fas fa-paper-plane"></i> Send Message
+      <button class="btn-whatsapp form-submit" onclick="submitForm()">
+        <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Send via WhatsApp
       </button>
       <div class="form-success" id="form-success">
-        ✓ Message sent! I'll get back to you soon.
+        ✓ Opening WhatsApp with your message!
       </div>
     </div>
   </div>
@@ -1490,6 +1590,9 @@
 </footer>
 
 <script>
+  // ── YOUR WHATSAPP NUMBER (with country code, no + or spaces) ──
+  const WA_NUMBER = '918925207524';
+
   // ── Typing effect
   const roles = ['Developer', 'Designer', 'Engineer'];
   let ri = 0, ci = 0, deleting = false;
@@ -1522,11 +1625,13 @@
   // ── Navbar scroll with glass effect
   window.addEventListener('scroll', () => {
     const nav = document.getElementById('navbar');
-    if (window.scrollY > 50) {
-      nav.classList.add('scrolled');
-    } else {
-      nav.classList.remove('scrolled');
-    }
+    if (window.scrollY > 50) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+
+    // Scroll-to-top button visibility
+    const btn = document.getElementById('scrollTop');
+    if (window.scrollY > 400) btn.classList.add('show');
+    else btn.classList.remove('show');
   });
 
   // ── Mobile menu with glass effect
@@ -1538,28 +1643,36 @@
     if (cta) cta.style.display = showing ? '' : 'none';
   }
 
-  // ── Form submit with animation
+  // ── Form submit → WhatsApp
   function submitForm() {
-    const n = document.getElementById('fname').value;
-    const e = document.getElementById('femail').value;
-    const m = document.getElementById('fmessage').value;
-    if (!n || !e || !m) { alert('Please fill in all required fields.'); return; }
-    
+    const n = document.getElementById('fname').value.trim();
+    const e = document.getElementById('femail').value.trim();
+    const s = document.getElementById('fsubject').value.trim();
+    const m = document.getElementById('fmessage').value.trim();
+
+    if (!n || !e || !m) {
+      alert('Please fill in Name, Email, and Message.');
+      return;
+    }
+
     const btn = document.querySelector('.form-submit');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    btn.style.background = 'var(--gold-light)';
-    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening WhatsApp...';
+
+    // Compose WhatsApp message
+    const text = `*New Portfolio Message* 🎯\n\n*Name:* ${n}\n*Email:* ${e}\n*Subject:* ${s || '(not specified)'}\n\n*Message:*\n${m}`;
+    const waURL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+
     setTimeout(() => {
       const success = document.getElementById('form-success');
       success.style.display = 'block';
-      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
-      btn.style.background = 'var(--gold)';
+      btn.innerHTML = '<i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Send via WhatsApp';
       document.getElementById('fname').value = '';
       document.getElementById('femail').value = '';
       document.getElementById('fsubject').value = '';
       document.getElementById('fmessage').value = '';
       setTimeout(() => success.style.display = 'none', 4000);
-    }, 1500);
+      window.open(waURL, '_blank');
+    }, 800);
   }
 
   // ── Smooth scroll close menu on link click
@@ -1578,6 +1691,21 @@
       heroImage.style.transform = `translateY(${scrolled * 0.1}px)`;
     }
   });
+
+  // ── Theme toggle (light / dark)
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const icon = document.getElementById('themeIcon');
+    const isLight = document.body.classList.contains('light-mode');
+    icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  }
+
+  // Restore saved theme
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.getElementById('themeIcon').className = 'fas fa-moon';
+  }
 </script>
 </body>
 </html>
