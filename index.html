@@ -346,15 +346,18 @@
   }
 
   .hero-badge {
-    position: absolute; bottom: 30px; left: -40px;
+    position: absolute;
+    bottom: 20px;
+    left: 0;
     background: var(--glass-bg);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border);
-    padding: 14px 20px;
-    z-index: 2;
+    border-radius: 10px;
+    padding: 12px 18px;
+    z-index: 10;
     animation: float 4s ease-in-out infinite;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   }
   .hero-badge .badge-label {
     font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold);
@@ -1279,10 +1282,11 @@
         <div style="font-family:var(--font-display); font-size:6rem; color:var(--gold); opacity:0.3;">D</div>
         <div style="font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted);">Dhayalan R</div>
       </div>
-      <div class="hero-badge">
-        <div class="badge-label">Based In</div>
-        <div class="badge-val">CBE</div>
-      </div>
+    </div>
+    <!-- Badge moved OUTSIDE the frame so overflow:hidden doesn't clip it -->
+    <div class="hero-badge">
+      <div class="badge-label">Based In</div>
+      <div class="badge-val">CBE</div>
     </div>
   </div>
 </section>
